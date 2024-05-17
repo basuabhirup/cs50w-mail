@@ -30,10 +30,53 @@ function load_mailbox(mailbox) {
   // Show the mailbox and hide other views
   document.querySelector("#emails-view").style.display = "block";
   document.querySelector("#compose-view").style.display = "none";
+  const emailsView = document.querySelector("#emails-view")
+
+  fetch(`/emails/${mailbox}`).then((response) => {
+    if (response.status === 200) {
+      response.json().then((emails) => {
+        console.log(emails);
+        if (emails.length > 0) {
+          emails.forEach((mail) => {
+            console.log(mail)
+            const mailBox = document.createElement('div')
+            mailBox.className = 'mail-box'
+
+            const sender = document.createElement('span')
+            sender.className = 'sender'
+            sender.textContent = mail.sender
+
+            const subject = document.createElement('span')
+            subject.textContent = mail.subject
+            subject.className = 'subject'
+
+            const timestamp = document.createElement('span')
+            timestamp.className = 'timestamp'
+            timestamp.textContent = mail.timestamp
+
+            mailBox.appendChild(sender)
+            mailBox.appendChild(subject)
+            mailBox.appendChild(timestamp)
+
+            emailsView.appendChild(mailBox)          
+            
+          });
+        }
+      });
+    } else {
+      response.json().then((json) => {
+        alert(json.error);
+        load_mailbox("inbox")
+      });
+    }
+  });
 
   // Show the mailbox name
-  document.querySelector("#emails-view").innerHTML = `<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)
-    }</h3>`;
+  emailsView.innerHTML = `<h3>${
+    mailbox.charAt(0).toUpperCase() + mailbox.slice(1)
+  }</h3>`;
+
+  console.log(mails)
 }
 
 function onEmailSent(event) {

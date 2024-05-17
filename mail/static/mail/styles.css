@@ -1,3 +1,28 @@
 textarea {
     min-height: 400px;
 }
+
+.mail-box {
+    display: flex;
+    border: 1px solid #444;
+    border-radius: 8px;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    margin-bottom: 1rem;
+}
+
+.mail-box > span {
+    margin: 2rem auto;
+}
+
+.mail-box > .sender {
+    margin-left: 0;
+    margin-right: 2rem;
+    padding-left: 0;
+}
+
+.mail-box > .subject {
+    margin-left: 0;
+    text-align: start;
+}
