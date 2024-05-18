@@ -4,25 +4,45 @@ textarea {
 
 .mail-box {
     display: flex;
-    border: 1px solid #444;
-    border-radius: 8px;
+    border: 1px solid #bbb;
+    border-radius: 4px;
     justify-content: space-between;
     align-items: center;
-    padding: 0.5rem 1rem;
-    margin-bottom: 1rem;
+    padding: 0 1rem;
+    margin-bottom: 0.25rem;
+    background-color: #eee;
+    /* font-weight: bold;
+    background-color: #fff;
+    border: 1px solid #888; */
+}
+
+.mail-box:hover {
+    cursor: pointer;
+}
+
+.mail-box.unread {
+    font-weight: bold;
+    background-color: #fff;
+    border: 1px solid #888;
 }
 
 .mail-box > span {
     margin: 2rem auto;
 }
 
-.mail-box > .sender {
+.mail-box > span.sender {
     margin-left: 0;
-    margin-right: 2rem;
-    padding-left: 0;
+    margin-right: 1rem;
+    width: 15rem;
 }
 
-.mail-box > .subject {
+.mail-box > span.subject {
     margin-left: 0;
     text-align: start;
+}
+
+.mail-box > span.timestamp {
+    text-align: end;
+    font-weight: light;
+    margin-right: 1rem;
 }

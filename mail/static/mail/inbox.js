@@ -40,7 +40,11 @@ function load_mailbox(mailbox) {
           emails.forEach((mail) => {
             console.log(mail)
             const mailBox = document.createElement('div')
-            mailBox.className = 'mail-box'
+            if (!mail.read) {
+              mailBox.className = 'mail-box unread'
+            } else {
+              mailBox.className = 'mail-box'
+            }
 
             const sender = document.createElement('span')
             sender.className = 'sender'
@@ -75,8 +79,6 @@ function load_mailbox(mailbox) {
   emailsView.innerHTML = `<h3>${
     mailbox.charAt(0).toUpperCase() + mailbox.slice(1)
   }</h3>`;
-
-  console.log(mails)
 }
 
 function onEmailSent(event) {
