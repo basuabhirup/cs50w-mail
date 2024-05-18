@@ -1,4 +1,12 @@
+let emailsView;
+let composeView;
+let emailDetailsView;
+
 document.addEventListener("DOMContentLoaded", function () {
+  emailsView = document.querySelector("#emails-view");
+  composeView = document.querySelector("#compose-view");
+  emailDetailsView = document.querySelector("#email-details-view");
+
   // Use buttons to toggle between views
   document
     .querySelector("#inbox")
@@ -14,10 +22,6 @@ document.addEventListener("DOMContentLoaded", function () {
   // By default, load the inbox
   load_mailbox("inbox");
 });
-
-const emailsView = document.querySelector("#emails-view");
-const composeView = document.querySelector("#compose-view");
-const emailDetailsView = document.querySelector("#email-details-view");
 
 function compose_email() {
   // Show compose view and hide other views
@@ -40,11 +44,14 @@ function load_mailbox(mailbox) {
   fetch(`/emails/${mailbox}`).then((response) => {
     if (response.status === 200) {
       response.json().then((emails) => {
-        console.log(emails);
+        // console.log(emails);
         if (emails.length > 0) {
           emails.forEach((mail) => {
-            console.log(mail);
+            // console.log(mail);
             const mailBox = document.createElement("div");
+            mailBox.addEventListener("click", function () {
+              load_details(mail.id);
+            });
             if (!mail.read) {
               mailBox.className = "mail-box unread";
             } else {
@@ -118,4 +125,89 @@ function onEmailSent(event) {
       }
     })
     .catch((error) => console.error(error));
+}
+
+function load_details(email_id) {
+  // Show the details of th selected email and hide other views
+  emailsView.style.display = "none";
+  composeView.style.display = "none";
+  emailDetailsView.style.display = "block";
+
+  fetch(`/emails/${email_id}`)
+    .then((response) => response.json())
+    .then((email) => {
+      // Print email
+      // console.log(email);
+
+      if (!email.error) {
+        emailDetailsView.innerHTML = "";
+
+        const header = document.createElement("section");
+        header.className = "mail-header";
+
+        const from = document.createElement("div");
+        from.innerHTML = `<strong>From: </strong>${email.sender}`;
+
+        const to = document.createElement("div");
+        to.innerHTML = `<strong>To: </strong>${email.recipients.join(", ")}`;
+
+        const subject = document.createElement("div");
+        subject.innerHTML = `<strong>Subject: </strong>${email.subject}`;
+
+        const timestamp = document.createElement("div");
+        timestamp.innerHTML = `<strong>Timestamp: </strong>${email.timestamp}`;
+
+        // const replyButton = document.createElement("button")
+        // replyButton.className = "reply-button"
+        // replyButton.textContent = "Reply"
+        // replyButton.addEventListener("click", function() {
+        //   console.log(email.sender)
+        // })
+
+        // const archiveButton = document.createElement("button")
+        // archiveButton.className = "archive-button"
+        // archiveButton.textContent = "Archive"
+        // archiveButton.addEventListener("click", function() {
+        //   console.log(email.sender)
+        // })
+
+        // const newline = document.createElement('br')
+
+        header.appendChild(from);
+        header.appendChild(to);
+        header.appendChild(subject);
+        header.appendChild(timestamp);
+        // header.appendChild(newline)
+        // header.appendChild(replyButton)
+        // header.appendChild(newline)
+        // header.appendChild(archiveButton)
+
+        const divider = document.createElement("hr");
+
+        const body = document.createElement("section");
+        body.className = "mail-body";
+        body.textContent = email.body;
+
+        emailDetailsView.appendChild(header);
+        emailDetailsView.appendChild(divider);
+        emailDetailsView.appendChild(body);
+
+        if (!email.read) {
+          fetch(`/emails/${email_id}`, {
+            method: 'PUT',
+            body: JSON.stringify({
+                read: true
+            })
+          })
+        }
+      } else {
+        alert(email.error)
+        console.error(email.error)
+        load_mailbox("inbox")
+      }
+    })
+    .catch((error) => {
+      console.error(error)
+      load_mailbox("inbox")
+    });
 }
