@@ -15,10 +15,15 @@ document.addEventListener("DOMContentLoaded", function () {
   load_mailbox("inbox");
 });
 
+const emailsView = document.querySelector("#emails-view");
+const composeView = document.querySelector("#compose-view");
+const emailDetailsView = document.querySelector("#email-details-view");
+
 function compose_email() {
   // Show compose view and hide other views
-  document.querySelector("#emails-view").style.display = "none";
-  document.querySelector("#compose-view").style.display = "block";
+  emailsView.style.display = "none";
+  composeView.style.display = "block";
+  emailDetailsView.style.display = "none";
 
   // Clear out composition fields
   document.querySelector("#compose-recipients").value = "";
@@ -28,9 +33,9 @@ function compose_email() {
 
 function load_mailbox(mailbox) {
   // Show the mailbox and hide other views
-  document.querySelector("#emails-view").style.display = "block";
-  document.querySelector("#compose-view").style.display = "none";
-  const emailsView = document.querySelector("#emails-view")
+  emailsView.style.display = "block";
+  composeView.style.display = "none";
+  emailDetailsView.style.display = "none";
 
   fetch(`/emails/${mailbox}`).then((response) => {
     if (response.status === 200) {
@@ -38,39 +43,38 @@ function load_mailbox(mailbox) {
         console.log(emails);
         if (emails.length > 0) {
           emails.forEach((mail) => {
-            console.log(mail)
-            const mailBox = document.createElement('div')
+            console.log(mail);
+            const mailBox = document.createElement("div");
             if (!mail.read) {
-              mailBox.className = 'mail-box unread'
+              mailBox.className = "mail-box unread";
             } else {
-              mailBox.className = 'mail-box'
+              mailBox.className = "mail-box";
             }
 
-            const sender = document.createElement('span')
-            sender.className = 'sender'
-            sender.textContent = mail.sender
+            const sender = document.createElement("span");
+            sender.className = "sender";
+            sender.textContent = mail.sender;
 
-            const subject = document.createElement('span')
-            subject.textContent = mail.subject
-            subject.className = 'subject'
+            const subject = document.createElement("span");
+            subject.textContent = mail.subject;
+            subject.className = "subject";
 
-            const timestamp = document.createElement('span')
-            timestamp.className = 'timestamp'
-            timestamp.textContent = mail.timestamp
+            const timestamp = document.createElement("span");
+            timestamp.className = "timestamp";
+            timestamp.textContent = mail.timestamp;
 
-            mailBox.appendChild(sender)
-            mailBox.appendChild(subject)
-            mailBox.appendChild(timestamp)
+            mailBox.appendChild(sender);
+            mailBox.appendChild(subject);
+            mailBox.appendChild(timestamp);
 
-            emailsView.appendChild(mailBox)          
-            
+            emailsView.appendChild(mailBox);
           });
         }
       });
     } else {
       response.json().then((json) => {
         alert(json.error);
-        load_mailbox("inbox")
+        load_mailbox("inbox");
       });
     }
   });
