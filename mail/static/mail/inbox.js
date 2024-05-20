@@ -23,16 +23,27 @@ document.addEventListener("DOMContentLoaded", function () {
   load_mailbox("inbox");
 });
 
-function compose_email() {
+function compose_email(email) {
   // Show compose view and hide other views
   emailsView.style.display = "none";
   composeView.style.display = "block";
   emailDetailsView.style.display = "none";
 
+  const recipients = document.querySelector("#compose-recipients");
+  const subject = document.querySelector("#compose-subject");
+  const body = document.querySelector("#compose-body");
+
   // Clear out composition fields
-  document.querySelector("#compose-recipients").value = "";
-  document.querySelector("#compose-subject").value = "";
-  document.querySelector("#compose-body").value = "";
+  recipients.value = "";
+  subject.value = "";
+  body.value = "";
+
+  // console.log(email.id)
+  if (!!email.id) {
+    recipients.value = email.sender
+    subject.value = email.subject.startsWith("Re: ") ? email.subject : `Re: ${email.subject}`
+    body.value = `On ${email.timestamp} ${email.sender} wrote: \n ${email.body} \n____________\n \n...`
+  }
 }
 
 function load_mailbox(mailbox) {
@@ -40,6 +51,7 @@ function load_mailbox(mailbox) {
   emailsView.style.display = "block";
   composeView.style.display = "none";
   emailDetailsView.style.display = "none";
+  emailsView.innerHTML = "";
 
   fetch(`/emails/${mailbox}`).then((response) => {
     if (response.status === 200) {
@@ -132,6 +144,7 @@ function load_details(email_id) {
   emailsView.style.display = "none";
   composeView.style.display = "none";
   emailDetailsView.style.display = "block";
+  emailDetailsView.innerHTML = "";
 
   fetch(`/emails/${email_id}`)
     .then((response) => response.json())
@@ -140,8 +153,6 @@ function load_details(email_id) {
       // console.log(email);
 
       if (!email.error) {
-        emailDetailsView.innerHTML = "";
-
         const header = document.createElement("section");
         header.className = "mail-header";
 
@@ -157,12 +168,12 @@ function load_details(email_id) {
         const timestamp = document.createElement("div");
         timestamp.innerHTML = `<strong>Timestamp: </strong>${email.timestamp}`;
 
-        // const replyButton = document.createElement("button")
-        // replyButton.className = "reply-button"
-        // replyButton.textContent = "Reply"
-        // replyButton.addEventListener("click", function() {
-        //   console.log(email.sender)
-        // })
+        const replyButton = document.createElement("button");
+        replyButton.className = "reply-button";
+        replyButton.textContent = "Reply";
+        replyButton.addEventListener("click", function () {
+          compose_email(email);
+        });
 
         // const archiveButton = document.createElement("button")
         // archiveButton.className = "archive-button"
@@ -171,14 +182,14 @@ function load_details(email_id) {
         //   console.log(email.sender)
         // })
 
-        // const newline = document.createElement('br')
+        const newline = document.createElement('br')
 
         header.appendChild(from);
         header.appendChild(to);
         header.appendChild(subject);
         header.appendChild(timestamp);
-        // header.appendChild(newline)
-        // header.appendChild(replyButton)
+        header.appendChild(newline);
+        header.appendChild(replyButton);
         // header.appendChild(newline)
         // header.appendChild(archiveButton)
 
@@ -194,20 +205,20 @@ function load_details(email_id) {
 
         if (!email.read) {
           fetch(`/emails/${email_id}`, {
-            method: 'PUT',
+            method: "PUT",
             body: JSON.stringify({
-                read: true
-            })
-          })
+              read: true,
+            }),
+          });
         }
       } else {
-        alert(email.error)
-        console.error(email.error)
-        load_mailbox("inbox")
+        alert(email.error);
+        console.error(email.error);
+        load_mailbox("inbox");
       }
     })
     .catch((error) => {
-      console.error(error)
-      load_mailbox("inbox")
+      console.error(error);
+      load_mailbox("inbox");
     });
 }
