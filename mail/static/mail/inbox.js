@@ -40,9 +40,11 @@ function compose_email(email) {
 
   // console.log(email.id)
   if (!!email.id) {
-    recipients.value = email.sender
-    subject.value = email.subject.startsWith("Re: ") ? email.subject : `Re: ${email.subject}`
-    body.value = `On ${email.timestamp} ${email.sender} wrote: \n ${email.body} \n____________\n \n...`
+    recipients.value = email.sender;
+    subject.value = email.subject.startsWith("Re: ")
+      ? email.subject
+      : `Re: ${email.subject}`;
+    body.value = `On ${email.timestamp} ${email.sender} wrote: \n ${email.body} \n____________\n \n...`;
   }
 }
 
@@ -62,7 +64,7 @@ function load_mailbox(mailbox) {
             // console.log(mail);
             const mailBox = document.createElement("div");
             mailBox.addEventListener("click", function () {
-              load_details(mail.id);
+              load_details(mail.id, mailbox);
             });
             if (!mail.read) {
               mailBox.className = "mail-box unread";
@@ -139,7 +141,7 @@ function onEmailSent(event) {
     .catch((error) => console.error(error));
 }
 
-function load_details(email_id) {
+function load_details(email_id, mailbox) {
   // Show the details of th selected email and hide other views
   emailsView.style.display = "none";
   composeView.style.display = "none";
@@ -175,14 +177,7 @@ function load_details(email_id) {
           compose_email(email);
         });
 
-        // const archiveButton = document.createElement("button")
-        // archiveButton.className = "archive-button"
-        // archiveButton.textContent = "Archive"
-        // archiveButton.addEventListener("click", function() {
-        //   console.log(email.sender)
-        // })
-
-        const newline = document.createElement('br')
+        const newline = document.createElement("br");
 
         header.appendChild(from);
         header.appendChild(to);
@@ -190,8 +185,6 @@ function load_details(email_id) {
         header.appendChild(timestamp);
         header.appendChild(newline);
         header.appendChild(replyButton);
-        // header.appendChild(newline)
-        // header.appendChild(archiveButton)
 
         const divider = document.createElement("hr");
 
@@ -202,6 +195,30 @@ function load_details(email_id) {
         emailDetailsView.appendChild(header);
         emailDetailsView.appendChild(divider);
         emailDetailsView.appendChild(body);
+
+        if (mailbox === "inbox" || mailbox === "archive") {
+          const archiveButton = document.createElement("button");
+          archiveButton.className = "archive-button";
+          archiveButton.textContent =
+            email.archived === true ? "Unarchive" : "Archive";
+
+          header.appendChild(newline);
+          header.appendChild(newline);
+          header.appendChild(archiveButton);
+
+          archiveButton.addEventListener("click", function () {
+            fetch(`/emails/${email_id}`, {
+              method: "PUT",
+              body: JSON.stringify({
+                archived: !email.archived,
+              }),
+            }).then((res) => {
+              if (res.status === 204) {
+                load_mailbox("inbox");
+              }
+            });
+          });
+        }
 
         if (!email.read) {
           fetch(`/emails/${email_id}`, {
