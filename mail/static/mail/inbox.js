@@ -171,7 +171,7 @@ function load_details(email_id, mailbox) {
         timestamp.innerHTML = `<strong>Timestamp: </strong>${email.timestamp}`;
 
         const replyButton = document.createElement("button");
-        replyButton.className = "reply-button";
+        replyButton.className = "btn btn-primary mt-3 mb-2";
         replyButton.textContent = "Reply";
         replyButton.addEventListener("click", function () {
           compose_email(email);
@@ -198,7 +198,7 @@ function load_details(email_id, mailbox) {
 
         if (mailbox === "inbox" || mailbox === "archive") {
           const archiveButton = document.createElement("button");
-          archiveButton.className = "archive-button";
+          archiveButton.className = "btn btn-outline-secondary mt-2 mb-3";
           archiveButton.textContent =
             email.archived === true ? "Unarchive" : "Archive";
 
